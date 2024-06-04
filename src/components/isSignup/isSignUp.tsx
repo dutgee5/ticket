@@ -1,5 +1,12 @@
-import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useState } from "react";
+import auth from '@react-native-firebase/auth';
 
 import { SafeAreaView, TextInput, Button } from "react-native";
 
@@ -8,36 +15,39 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
 
   const handleLogin = () => {
-    // Giriş işlemini burada gerçekleştirin
-    console.log("Email:", email);
-    console.log("Password:", password);
+
+    auth()
+    .signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      console.log('User signed in!', userCredential.user);
+    })
+    .catch(error => {
+      setError(error.message);
+      console.error(error);
+    });
   };
 
   const handleSignUp = () => {
-    // Kayıt işlemini burada gerçekleştirin
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Password:", password);
+    auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        console.log('User account created & signed in!', userCredential.user);
+      })
+      .catch(error => {
+        setError(error.message);
+        console.error(error);
+      });
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.form}>
-        <Text style={styles.title}>
-          {isSignUp ? "Create Account" : "Welcome Back!"}
-        </Text>
-        {isSignUp && (
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            placeholderTextColor="#aaa"
-            value={name}
-            onChangeText={setName}
-            autoCapitalize="words"
-          />
-        )}
+        <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Welcome Back!'}</Text>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -56,41 +66,35 @@ const SignUp = () => {
           secureTextEntry
           autoCapitalize="none"
         />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={isSignUp ? handleSignUp : handleLogin}
-        >
-          <Text style={styles.buttonText}>
-            {isSignUp ? "Sign Up" : "Login"}
-          </Text>
+
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        <TouchableOpacity style={styles.button} onPress={isSignUp ? handleSignUp : handleLogin}>
+          <Text style={styles.buttonText}>{isSignUp ? 'Sign Up' : 'Login'}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
           <Text style={styles.toggleText}>
-            {isSignUp
-              ? "Already have an account? Login"
-              : "Don't have an account? Sign Up"}
+            {isSignUp ? 'Already have an account? Login' : 'Don\'t have an account? Sign Up'}
           </Text>
         </TouchableOpacity>
-      </View>
+        </View>
     </SafeAreaView>
   );
-}
+};
 export default SignUp;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#1e1e1e",
+    backgroundColor: '#1e1e1e',
+    justifyContent: 'center',
     paddingHorizontal: 16,
   },
   form: {
-    width: "100%",
+    width: '100%',
     padding: 20,
-    backgroundColor: "#292929",
+    backgroundColor: '#292929',
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
@@ -98,37 +102,42 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
+    fontWeight: 'bold',
+    color: '#fff',
     marginBottom: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   input: {
     height: 50,
-    borderColor: "#444",
+    borderColor: '#444',
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: "#3a3a3a",
-    color: "#fff",
+    backgroundColor: '#3a3a3a',
+    color: '#fff',
   },
   button: {
     height: 50,
-    backgroundColor: "#ff6b6b",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#ff6b6b',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 5,
     marginBottom: 10,
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   toggleText: {
-    color: "#ff6b6b",
-    textAlign: "center",
+    color: '#ff6b6b',
+    textAlign: 'center',
     marginTop: 10,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });

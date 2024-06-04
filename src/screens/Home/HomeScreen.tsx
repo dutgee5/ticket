@@ -90,8 +90,11 @@ const HomeScreen: React.FC = () => {
       <FlatList
         data={events}
         renderItem={({ item }) => (
-          <TouchableHighlight style={{}} onPress={() => {}}
-          underlayColor={'#FC1055'}>
+          <TouchableHighlight
+            style={{}}
+            onPress={() => {}}
+            underlayColor={"#FC1055"}
+          >
             <EventCard
               eventName={item.eventName}
               eventDate={item.eventDate}
@@ -101,6 +104,8 @@ const HomeScreen: React.FC = () => {
         )}
         keyExtractor={(item, index) => index.toString()}
       />
+
+      {/* data fetch -> TanStack Query*/}
     </View>
   );
 };
